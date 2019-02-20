@@ -1,5 +1,6 @@
 from flask import Flask, request, render_template, redirect, url_for
 from flask import g
+import os
 import requests, json
 
 app = Flask(__name__)
@@ -33,11 +34,9 @@ def create_user():
     for u in exist_users:
         if u['username'] == username:
             return 'user exists'
-
     r = requests.post('https://hunter-todo-api.herokuapp.com/user', data=json.dumps({'username': username}))
-    return r.text
-
-
+    return render_template('login.html')
+    
 @app.route('/login')
 def login():
     return render_template('login.html')
@@ -71,7 +70,6 @@ def create_item():
 def test():
     return redirect(url_for('hello'))
 
-
-if __name__ == '__main__':
-    app.debug = True
-    app.run()
+if __name__ == "__main__":
+	port = int(os.environ.get("PORT", 5000))
+	app.run(host="0.0.0.0", port=port, threaded=True,debug=True)
