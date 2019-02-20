@@ -36,7 +36,7 @@ def create_user():
             return 'user exists'
     r = requests.post('https://hunter-todo-api.herokuapp.com/user', data=json.dumps({'username': username}))
     return render_template('login.html')
-    
+
 @app.route('/login')
 def login():
     return render_template('login.html')
@@ -64,6 +64,16 @@ def new_item():
 def create_item():
     content = request.form['content']
     r = requests.post('https://hunter-todo-api.herokuapp.com/todo-item', data=json.dumps({'content': content}), cookies=g.cookies)
+    return redirect('/todo-item')
+
+@app.route('/completed-item', methods=['post'])
+def completed_item():
+    r = requests.post('https://hunter-todo-api.herokuapp.com/todo-item',data=json.dumps({'completed':True}),cookies=g.cookies)
+    return redirect('/todo-item')
+
+@app.route('/delete-item', methods=['post'])
+def delete_item():
+    r = requests.post('https://hunter-todo-api.herokuapp.com/todo-item',data=json.dumps({'delete':True}),cookies=g.cookies)
     return redirect('/todo-item')
 
 @app.route('/test')
