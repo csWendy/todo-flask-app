@@ -5,7 +5,7 @@
         <a href="/new-item">New Item</a>
         {{todo_item}}
         <ul>
-      		{% for item in items %}
+      		{% for item in todo_items %}
       			<li>
       				{% if item['completed'] %}
       					<del>{{item['content']}}</del>
