@@ -1,20 +1,19 @@
 <html>
     <body>
         <h1>Todo App</h1>
-        <p>Best todo app ever</p>
         <a href="/new-item">New Item</a>
-        {{todo_item}}
         <ul>
-      		{% for item in todo_items %}
+      		{% for item in todo_item %}
       			<li>
-      				{% if item['completed'] %}
-      					<del>{{item['content']}}</del>
-      				{% else: %}
-      					{{item['content']}} <a href="{{url_for('complete', id = item['id'])}}">Completed</a>
+      				{% if item.completed %}
+      					<del>{{item.content}}</del>
+      				{% else %}
+      					{{item.content}} <a href="{{url_for('completed_item', id = item.id)}}">Completed</a>
       				{% endif %}
-      					<a href="{{url_for('delete', id = item['id'])}}">Delete</a>
+      					<a href="{{url_for('delete_item', id = item.id)}}">Delete</a>
       			</li>
       		{% endfor %}
       	</ul>
+        	<a href="{{url_for('login')}}">Log out</a>
     </body>
 </html>
