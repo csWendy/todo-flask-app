@@ -1,4 +1,4 @@
-from flask import Flask, request, render_template, redirect, url_for
+from flask import Flask, request, render_template, redirect, url_for, make_response
 import os
 import requests, json
 
@@ -36,16 +36,24 @@ def login():
 def login_user():
     username = request.form['username']
     r = requests.post('https://hunter-todo-api.herokuapp.com/auth', data=json.dumps({'username': username}))
-    if r.status_code == 200:
-        global gcookies
-        gcookies = r.cookies
-        return redirect('/todo-item')
-    else:
-        return 'login error'
+    jar = r.cookies
+    print("cookiejar object: ", jar)
+
+    #store info in a cookie
+    response = make_response(redirect("/todo-item"))
+    response.set_cookie('sillyauth', jar['sillyauth'])
+    response.set_cookie('username', username)
+    return response
+
 
 @app.route('/todo-item',methods = ['GET','POST'])
 def todo_item():
-    r = requests.get('https://hunter-todo-api.herokuapp.com/todo-item', cookies=gcookies)
+    #retrieved info from cookies
+    val = request.cookies.get('sillyauth')
+    jary = requests.cookies.RequestsCookieJar()
+    jary.set('sillyauth', val, domain="hunter-todo-api.herokuapp.com")
+
+    r = requests.get('https://hunter-todo-api.herokuapp.com/todo-item', cookies=jary)
     return render_template('todo-item.html', todo_item = r.json())
 
 @app.route('/new-item')
@@ -54,18 +62,33 @@ def new_item():
 
 @app.route('/create-item', methods=['post'])
 def create_item():
+    #retrieved info from cookies
+    val = request.cookies.get('sillyauth')
+    jary = requests.cookies.RequestsCookieJar()
+    jary.set('sillyauth', val, domain="hunter-todo-api.herokuapp.com")
+
     content = request.form['content']
-    r = requests.post('https://hunter-todo-api.herokuapp.com/todo-item', data=json.dumps({'content': content}), cookies=gcookies)
+    r = requests.post('https://hunter-todo-api.herokuapp.com/todo-item', data=json.dumps({'content': content}), cookies=jary)
     return redirect('/todo-item')
 
 @app.route('/completed-item/<id>')
 def completed_item(id):
-    r = requests.put('https://hunter-todo-api.herokuapp.com/todo-item/' + id,data=json.dumps({'completed':True}),cookies=gcookies)
+    #retrieved info from cookies
+    val = request.cookies.get('sillyauth')
+    jary = requests.cookies.RequestsCookieJar()
+    jary.set('sillyauth', val, domain="hunter-todo-api.herokuapp.com")
+
+    r = requests.put('https://hunter-todo-api.herokuapp.com/todo-item/' + id,data=json.dumps({'completed':True}),cookies=jary)
     return redirect('/todo-item')
 
 @app.route('/delete-item/<id>')
 def delete_item(id):
-    r = requests.delete('https://hunter-todo-api.herokuapp.com/todo-item/' + id,data=json.dumps({'delete':True}),cookies=gcookies)
+    #retrieved info from cookies
+    val = request.cookies.get('sillyauth')
+    jary = requests.cookies.RequestsCookieJar()
+    jary.set('sillyauth', val, domain="hunter-todo-api.herokuapp.com")
+
+    r = requests.delete('https://hunter-todo-api.herokuapp.com/todo-item/' + id,data=json.dumps({'delete':True}),cookies=jary)
     return redirect('/todo-item')
 
 if __name__ == "__main__":
