@@ -37,12 +37,12 @@ def login_user():
     username = request.form['username']
     r = requests.post('https://hunter-todo-api.herokuapp.com/auth', data=json.dumps({'username': username}))
     jar = r.cookies
-    print("cookiejar object: ", jar)
 
     #store info in a cookie
     response = make_response(redirect("/todo-item"))
     response.set_cookie('sillyauth', jar['sillyauth'])
     response.set_cookie('username', username)
+
     return response
 
 
@@ -64,11 +64,11 @@ def new_item():
 def create_item():
     #retrieved info from cookies
     val = request.cookies.get('sillyauth')
-    jary = requests.cookies.RequestsCookieJar()
-    jary.set('sillyauth', val, domain="hunter-todo-api.herokuapp.com")
+    jary1 = requests.cookies.RequestsCookieJar()
+    jary1.set('sillyauth', val, domain="hunter-todo-api.herokuapp.com")
 
     content = request.form['content']
-    r = requests.post('https://hunter-todo-api.herokuapp.com/todo-item', data=json.dumps({'content': content}), cookies=jary)
+    r = requests.post('https://hunter-todo-api.herokuapp.com/todo-item', data=json.dumps({'content': content}), cookies=jary1)
     return redirect('/todo-item')
 
 @app.route('/completed-item/<id>')
